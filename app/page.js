@@ -3793,7 +3793,7 @@ export default function Home() {
 
                                 rel="noreferrer"
 
-                                title="cs8ailesi"
+                                title="lca.pro"
 
                               >
 
@@ -4943,7 +4943,7 @@ export default function Home() {
 
                       <strong>
 
-                        cs8ailesi
+                        lca.pro
 
                       </strong>
 
