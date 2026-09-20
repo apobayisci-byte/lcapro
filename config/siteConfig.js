@@ -3,7 +3,7 @@
   subTitle: "PRO PUBLIC",
   slogan: "TÜRKİYE CS 1.6 TOPLULUĞU.",
 
-  logo: "/test.jpg",
+  logo: "/lcapropublic.png",
 
   footerDescription:
     "Counter-Strike 1.6 topluluğu. Aynı oyun, aynı rekabet.",
