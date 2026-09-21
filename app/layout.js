@@ -30,9 +30,9 @@ export const metadata = {
   ],
 
   icons: {
-    icon: "/test.jpg",
-    shortcut: "/test.jpg",
-    apple: "/test.jpg",
+    icon: "/lcapropublic.png",
+    shortcut: "/lcapropublic.png",
+    apple: "/lcapropublic.png",
   },
 
   openGraph: {
