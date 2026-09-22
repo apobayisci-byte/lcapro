@@ -3755,3 +3755,48 @@ button, input { font: inherit; }
     border-bottom: 1px solid rgba(227, 38, 38, 0.12) !important;
   }
 }
+
+/* =========================================================
+   LCA PRO - MOBIL GENEL FALLBACK
+========================================================= */
+@media (max-width: 760px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .site-page,
+  .admin-page {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .admin-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-content {
+    min-width: 0;
+  }
+
+  .admin-card,
+  .admin-login-box {
+    max-width: 100%;
+  }
+
+  .gallery-upload-form,
+  .management-admin-form,
+  .server-admin-form,
+  .admin-server-grid,
+  .admin-gallery-grid,
+  .admin-management-grid {
+    grid-template-columns: 1fr;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+  }
+}
+

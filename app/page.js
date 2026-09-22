@@ -102,6 +102,8 @@ export default function Home() {
 
   const [activeSection, setActiveSection] = useState("anasayfa");
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const [servers, setServers] = useState([]);
 
   const [serversLoading, setServersLoading] = useState(true);
@@ -1323,40 +1325,34 @@ export default function Home() {
 
   }
 
-  function goToSection(
-
-    sectionId
-
-  ) {
-
-    const section =
-
-      document.getElementById(
-
-        sectionId
-
-      );
+  function goToSection(sectionId) {
+    const section = document.getElementById(sectionId);
 
     if (!section) return;
 
-    section.scrollIntoView({
+    setMobileMenuOpen(false);
 
-      behavior: "smooth",
+    const scrollToTarget = () => {
+      const mobile = window.matchMedia("(max-width: 900px)").matches;
+      const headerOffset = mobile ? 68 : 86;
+      const extraGap = 0;
+      const top =
+        section.getBoundingClientRect().top +
+        window.scrollY -
+        headerOffset -
+        extraGap;
 
-      block: "start",
+      window.scrollTo({
+        top: Math.max(0, top),
+        behavior: "smooth",
+      });
+    };
 
+    requestAnimationFrame(() => {
+      requestAnimationFrame(scrollToTarget);
     });
 
-    window.history.replaceState(
-
-      {},
-
-      "",
-
-      "/"
-
-    );
-
+    window.history.replaceState({}, "", "/");
   }
 
   function showMoreGallery() {
@@ -1552,180 +1548,130 @@ export default function Home() {
     <main className="site-page">
 
       <header className="navbar">
-
         <div className="navbar-inner">
+          <button
+            type="button"
+            className={`mobile-menu-toggle ${mobileMenuOpen ? "open" : ""}`}
+            aria-label={mobileMenuOpen ? "Menüyü kapat" : "Menüyü aç"}
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen((old) => !old)}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
 
           <a
-
             href="/"
-
-            className="brand"
-
+            className="brand mobile-brand"
             onClick={(event) => {
-
               event.preventDefault();
-
-              goToSection(
-
-                "anasayfa"
-
-              );
-
+              goToSection("anasayfa");
             }}
-
           >
-
             <img
-
               src={siteConfig.logo}
-
-              alt="Counter-Strike"
-
+              alt=""
               className="brand-logo-image"
-
             />
-
             <div className="brand-text">
-
-              <strong>
-
-                {siteConfig.brandName}
-
-              </strong>
-
-              <span>
-
-                {siteConfig.subTitle}
-
-              </span>
-
+              <strong>{siteConfig.brandName}</strong>
+              <span>{siteConfig.subTitle}</span>
             </div>
-
           </a>
 
-          <nav className="nav-links">
-
+          <nav className="desktop-nav desktop-nav-left" aria-label="Sol menü">
             {[
-
-              [
-
-                "anasayfa",
-
-                "Ana Sayfa",
-
-              ],
-
-              [
-
-                "sunucular",
-
-                "Sunucular",
-
-              ],
-
-              [
-
-                "galeri",
-
-                "Galeri",
-
-              ],
-
-              [
-
-                "yonetim",
-
-                "Yönetim",
-
-              ],
-
-              [
-
-                "kurallar",
-
-                "Kurallar",
-
-              ],
-
-              [
-
-                "fiyatlar",
-
-                "Fiyatlar",
-
-              ],
-
-              [
-
-                "dosyalar",
-
-                "Dosyalar",
-
-              ],
-
-              [
-
-                "destek",
-
-                "Destek",
-
-              ],
-
-              [
-
-                "iletisim",
-
-                "İletişim",
-
-              ],
-
-            ].map(
-
-              ([id, label]) => (
-
-                <a
-
-                  key={id}
-
-                  href="/"
-
-                  className={navClass(
-
-                    id
-
-                  )}
-
-                  onClick={(
-
-                    event
-
-                  ) => {
-
-                    event.preventDefault();
-
-                    goToSection(
-
-                      id
-
-                    );
-
-                  }}
-
-                >
-
-                  {label}
-
-                </a>
-
-              )
-
-            )}
-
+              ["anasayfa", "Ana Sayfa"],
+              ["sunucular", "Sunucular"],
+              ["galeri", "Galeri"],
+              ["yonetim", "Yönetim"],
+            ].map(([id, label]) => (
+              <a
+                key={id}
+                href="/"
+                className={navClass(id)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  goToSection(id);
+                }}
+              >
+                {label}
+              </a>
+            ))}
           </nav>
 
-        </div>
+          <a
+            href="/"
+            className="desktop-brand"
+            aria-label={`${siteConfig.brandName} ana sayfa`}
+            onClick={(event) => {
+              event.preventDefault();
+              goToSection("anasayfa");
+            }}
+          >
+            <img src={siteConfig.logo} alt="" />
+            <span className="desktop-brand-glow"></span>
+          </a>
 
+          <nav className="desktop-nav desktop-nav-right" aria-label="Sağ menü">
+            {[
+              ["kurallar", "Kurallar"],
+              ["fiyatlar", "Fiyatlar"],
+              ["dosyalar", "Dosyalar"],
+              ["destek", "Destek"],
+              ["iletisim", "İletişim"],
+            ].map(([id, label]) => (
+              <a
+                key={id}
+                href="/"
+                className={navClass(id)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  goToSection(id);
+                }}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+
+          <nav className={`nav-links mobile-nav ${mobileMenuOpen ? "mobile-open" : ""}`}>
+            {[
+              ["anasayfa", "Ana Sayfa"],
+              ["sunucular", "Sunucular"],
+              ["galeri", "Galeri"],
+              ["yonetim", "Yönetim"],
+              ["kurallar", "Kurallar"],
+              ["fiyatlar", "Fiyatlar"],
+              ["dosyalar", "Dosyalar"],
+              ["destek", "Destek"],
+              ["iletisim", "İletişim"],
+            ].map(([id, label]) => (
+              <a
+                key={id}
+                href="/"
+                className={navClass(id)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  goToSection(id);
+                }}
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+        </div>
       </header>
+
+      {mobileMenuOpen && (
+        <button
+          type="button"
+          className="mobile-menu-backdrop"
+          aria-label="Menüyü kapat"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
 
       <section
 
@@ -2313,7 +2259,7 @@ export default function Home() {
 
 
           /* =========================
-             FİYATLAR
+             FİYATLAR - KOMPAKT / RESPONSIVE
              ========================= */
           #fiyatlar .prices-section-content {
             width: min(1180px, calc(100% - 72px));
@@ -2323,24 +2269,26 @@ export default function Home() {
             width: 100%;
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 18px;
-            margin-top: 28px;
+            align-items: stretch;
+            gap: 16px;
+            margin-top: 26px;
           }
 
           #fiyatlar .price-card {
             position: relative;
-            min-height: 390px;
-            height: auto;
-            padding: 24px 26px 24px;
+            width: 100%;
+            min-height: 250px;
+            padding: 18px 18px 16px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             isolation: isolate;
+            text-align: left;
             background:
               linear-gradient(
                 140deg,
                 rgba(22, 20, 16, 0.78),
-                rgba(8, 9, 9, 0.94)
+                rgba(8, 9, 9, 0.95)
               );
             border: 1px solid rgba(242, 238, 230, 0.19);
             border-radius: 16px;
@@ -2362,25 +2310,14 @@ export default function Home() {
             background:
               radial-gradient(
                 circle at 8% 12%,
-                rgba(238, 235, 228, 0.085),
+                rgba(238, 235, 228, 0.075),
                 transparent 37%
               ),
               radial-gradient(
                 circle at 100% 100%,
-                rgba(238, 235, 228, 0.03),
+                rgba(238, 235, 228, 0.025),
                 transparent 45%
               );
-          }
-
-          #fiyatlar .price-card::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            border-radius: inherit;
-            box-shadow:
-              inset 0 0 36px rgba(238, 235, 228, 0.025);
           }
 
           #fiyatlar .price-card > * {
@@ -2392,112 +2329,185 @@ export default function Home() {
             border-color: rgba(242, 238, 230, 0.32);
             box-shadow:
               inset 0 1px 0 rgba(255, 255, 255, 0.04),
-              inset 0 0 30px rgba(238, 235, 228, 0.02),
-              0 18px 42px rgba(0, 0, 0, 0.30),
-              0 0 16px rgba(238, 235, 228, 0.02);
+              0 22px 50px rgba(0, 0, 0, 0.30);
             transform: translateY(-2px);
           }
 
           #fiyatlar .price-card-number {
             position: absolute;
-            top: 18px;
-            right: 18px;
-            color: rgba(227, 38, 38, 0.09);
-            font-size: 42px;
+            top: 13px;
+            right: 14px;
+            color: rgba(227, 38, 38, 0.085);
+            font-size: 30px;
             font-weight: 900;
             line-height: 1;
           }
 
           #fiyatlar .price-card-head {
-            position: relative;
-            z-index: 2;
-            padding: 0 42px;
+            min-height: 44px;
+            padding: 0 34px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
             text-align: center;
           }
 
           #fiyatlar .price-card-head small {
             display: block;
-            margin-bottom: 7px;
+            margin-bottom: 5px;
             color: #7f7a72;
-            font-size: 7px;
+            font-size: 6.5px;
             font-weight: 700;
-            letter-spacing: 2.2px;
-            text-align: center;
+            letter-spacing: 1.8px;
           }
 
           #fiyatlar .price-card-head h3 {
             margin: 0;
             color: #f0ede6;
-            font-size: clamp(17px, 1.25vw, 21px);
-            line-height: 1.12;
-            text-align: center;
+            font-size: clamp(15px, 1vw, 18px);
+            line-height: 1.18;
             overflow-wrap: anywhere;
           }
 
+          /* Fiyat/periyot yoksa sadece başlığı boş meta alanının içine doğru
+             görsel olarak ortala. Alan yüksekliği değişmez; simetri korunur. */
+          #fiyatlar .price-card-head-centered {
+            transform: translateY(11px);
+          }
+
           #fiyatlar .price-card-price {
-            margin-top: 10px;
-            padding: 0 0 16px;
+            min-height: 31px;
+            margin-top: 6px;
+            padding-bottom: 9px;
             display: flex;
-            align-items: baseline;
+            align-items: center;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 6px;
-            color: #f1eee8;
-            border-bottom: 1px solid rgba(242, 238, 230, 0.10);
+            gap: 5px;
+            border-bottom: 1px solid rgba(242, 238, 230, 0.09);
             text-align: center;
+          }
+
+          #fiyatlar .price-card-price-empty {
+            visibility: hidden;
           }
 
           #fiyatlar .price-card-price-main {
             color: #f1eee8;
-            font-size: clamp(19px, 1.45vw, 24px);
+            font-size: 15px;
             font-weight: 850;
-            letter-spacing: 0.1px;
           }
 
           #fiyatlar .price-card-period {
             color: #9f9a92;
-            font-size: 10px;
+            font-size: 8.5px;
             font-weight: 700;
-            letter-spacing: 0.4px;
           }
 
           #fiyatlar .price-card-description {
-            margin: 14px 0 0;
-            color: #a8a39b;
-            font-size: 11px;
-            line-height: 1.55;
+            margin: 11px 0 0;
+            color: #aaa59d;
+            font-size: 9.5px;
+            line-height: 1.5;
             white-space: pre-wrap;
             overflow-wrap: anywhere;
           }
 
+          #fiyatlar .price-card-description-bottom {
+            min-height: 44px;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            padding-top: 10px;
+            display: flex;
+            align-items: flex-start;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+          }
+
+          #fiyatlar .price-card-table-wrap {
+            width: 100%;
+            height: 172px;
+            margin-top: 12px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.065);
+            border-radius: 8px;
+            scrollbar-width: thin;
+          }
+
+          #fiyatlar .price-card-table {
+            min-width: 0;
+            width: 100%;
+          }
+
+          #fiyatlar .price-table-row {
+            width: 100%;
+            min-width: 0;
+            min-height: 34px;
+            display: grid;
+            align-items: stretch;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+          }
+
+          #fiyatlar .price-table-head {
+            min-height: 30px;
+          }
+
+          #fiyatlar .price-table-row:last-child {
+            border-bottom: 0;
+          }
+
+          #fiyatlar .price-table-row span {
+            min-width: 0;
+            padding: 8px 7px;
+            display: flex;
+            align-items: center;
+            color: #d6d1c8;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 8.5px;
+            font-weight: 600;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
+          }
+
+          #fiyatlar .price-table-row span:last-child {
+            border-right: 0;
+          }
+
+          #fiyatlar .price-table-head {
+            background: rgba(227, 38, 38, 0.055);
+          }
+
+          #fiyatlar .price-table-head span {
+            color: #a9a39b;
+            font-size: 7.5px;
+            font-weight: 800;
+            letter-spacing: 0.35px;
+            text-transform: uppercase;
+          }
+
           #fiyatlar .price-card-features {
             display: grid;
-            gap: 8px;
-            margin-top: 16px;
-            margin-bottom: 18px;
+            gap: 7px;
+            margin-top: 12px;
+            margin-bottom: 12px;
           }
 
           #fiyatlar .price-card-feature {
             min-width: 0;
             display: flex;
             align-items: flex-start;
-            gap: 9px;
+            gap: 8px;
             color: #d8d4cc;
-            font-size: 10.5px;
-            line-height: 1.42;
-          }
-
-          #fiyatlar .price-card-feature strong {
-            min-width: 0;
-            overflow-wrap: anywhere;
-            word-break: break-word;
+            font-size: 9px;
+            line-height: 1.4;
           }
 
           #fiyatlar .price-card-feature > span {
-            width: 6px;
-            height: 6px;
-            margin-top: 5px;
-            flex: 0 0 6px;
+            width: 5px;
+            height: 5px;
+            margin-top: 4px;
+            flex: 0 0 5px;
             background: #e32626;
             border-radius: 50%;
             box-shadow: 0 0 8px rgba(227, 38, 38, 0.35);
@@ -2507,22 +2517,24 @@ export default function Home() {
             min-width: 0;
             font-weight: 600;
             overflow-wrap: anywhere;
-            word-break: break-word;
           }
 
           #fiyatlar .price-card-action {
             width: 100%;
-            min-height: 42px;
+            min-height: 38px;
             margin-top: auto;
-            flex: 0 0 auto;
-            padding: 0 16px;
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #f3efe8;
             background: rgba(0, 0, 0, 0.30);
-            border: 1px solid rgba(242, 238, 230, 0.20);
+            border: 1px solid rgba(242, 238, 230, 0.18);
             border-radius: 6px;
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 900;
-            letter-spacing: 0.9px;
+            letter-spacing: 0.65px;
+            text-align: center;
             cursor: pointer;
             transition:
               border-color 0.2s ease,
@@ -2530,16 +2542,17 @@ export default function Home() {
               transform 0.2s ease;
           }
 
-          #fiyatlar .price-card-action:hover {
-            border-color: rgba(242, 238, 230, 0.38);
-            background: rgba(255, 255, 255, 0.04);
+          #fiyatlar .price-card-whatsapp:hover {
+            color: #f4fff6;
+            border-color: rgba(58, 190, 100, 0.58);
+            background: rgba(36, 145, 72, 0.12);
             transform: translateY(-1px);
           }
 
           #fiyatlar .prices-state {
             width: 100%;
             margin-top: 28px;
-            padding: 28px;
+            padding: 24px;
             color: #aaa69f;
             text-align: center;
             background: rgba(10, 10, 10, 0.70);
@@ -2551,13 +2564,45 @@ export default function Home() {
             color: #e05252;
           }
 
-          @media (max-width: 900px) {
+          @media (max-width: 1000px) {
+            #fiyatlar .prices-grid {
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+          }
+
+          @media (max-width: 680px) {
+            #fiyatlar .prices-section-content {
+              width: 100%;
+            }
+
             #fiyatlar .prices-grid {
               grid-template-columns: 1fr;
+              gap: 12px;
+              margin-top: 20px;
             }
 
             #fiyatlar .price-card {
               min-height: 0;
+              padding: 16px 14px 14px;
+              border-radius: 13px;
+            }
+
+            #fiyatlar .price-card-head h3 {
+              font-size: 17px;
+            }
+
+            #fiyatlar .price-card-table-wrap {
+              height: auto;
+              min-height: 168px;
+            }
+
+            #fiyatlar .price-table-row span {
+              padding: 8px 5px;
+              font-size: 8px;
+            }
+
+            #fiyatlar .price-table-head span {
+              font-size: 7px;
             }
           }
 
@@ -2893,7 +2938,950 @@ export default function Home() {
             }
           }
 
-        `}</style>
+        
+
+
+          /* =========================
+             DESKTOP NAVBAR - ORTADA LOGO
+             ========================= */
+          @media (min-width: 901px) {
+            .navbar {
+              height: 88px !important;
+              background:
+                linear-gradient(
+                  180deg,
+                  rgba(5, 5, 5, 0.96) 0%,
+                  rgba(5, 5, 5, 0.90) 100%
+                ) !important;
+              border-top: 1px solid rgba(227, 38, 38, 0.18) !important;
+              border-bottom: 1px solid rgba(227, 38, 38, 0.15) !important;
+              box-shadow:
+                0 14px 34px rgba(0, 0, 0, 0.28),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+              backdrop-filter: blur(14px);
+              -webkit-backdrop-filter: blur(14px);
+            }
+
+            .navbar::before {
+              content: "";
+              position: absolute;
+              left: 50%;
+              top: 0;
+              width: 72px;
+              height: 2px;
+              background: #e32626;
+              transform: translateX(-50%);
+              box-shadow: 0 0 14px rgba(227, 38, 38, 0.45);
+              pointer-events: none;
+            }
+
+            .navbar-inner {
+              position: relative;
+              width: min(1480px, calc(100% - 48px));
+              height: 88px !important;
+              margin: 0 auto;
+              padding: 0 !important;
+              display: grid !important;
+              grid-template-columns:
+                minmax(0, 1fr)
+                104px
+                minmax(0, 1fr);
+              align-items: center !important;
+              gap: 20px !important;
+            }
+
+            .mobile-menu-toggle,
+            .mobile-brand,
+            .mobile-nav {
+              display: none !important;
+            }
+
+            .desktop-nav {
+              height: 100%;
+              display: flex !important;
+              align-items: center;
+              gap: clamp(24px, 2.2vw, 42px);
+              min-width: 0;
+            }
+
+            .desktop-nav-left {
+              justify-content: flex-end;
+              padding-right: 18px;
+            }
+
+            .desktop-nav-right {
+              justify-content: flex-start;
+              padding-left: 18px;
+            }
+
+            .desktop-nav a {
+              position: relative;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #d2d2d2;
+              font-size: 14px;
+              font-weight: 500;
+              letter-spacing: 0;
+              text-transform: none;
+              white-space: nowrap;
+              transition:
+                color 0.2s ease,
+                transform 0.2s ease;
+            }
+
+            .desktop-nav a:hover,
+            .desktop-nav a.active {
+              color: #f4f0e8;
+              transform: translateY(-1px);
+            }
+
+            .desktop-nav a.active {
+              color: #e32626;
+            }
+
+            .desktop-nav a::after {
+              content: "";
+              position: absolute;
+              left: 50%;
+              bottom: 14px;
+              width: 0;
+              height: 2px;
+              background: #e32626;
+              transform: translateX(-50%);
+              transition: width 0.2s ease;
+              box-shadow: 0 0 10px rgba(227, 38, 38, 0.35);
+            }
+
+            .desktop-nav a:hover::after {
+              width: 24px;
+            }
+
+            .desktop-nav a.active::after {
+              width: 34px;
+            }
+
+            .desktop-brand {
+              position: relative;
+              width: 104px;
+              height: 88px;
+              display: flex !important;
+              align-items: center;
+              justify-content: center;
+              z-index: 2;
+            }
+
+            .desktop-brand img {
+              position: relative;
+              z-index: 2;
+              width: 72px;
+              height: 72px;
+              object-fit: contain;
+              filter:
+                drop-shadow(0 8px 14px rgba(0, 0, 0, 0.45))
+                drop-shadow(0 0 12px rgba(227, 38, 38, 0.10));
+              transition:
+                transform 0.22s ease,
+                filter 0.22s ease;
+            }
+
+            .desktop-brand:hover img {
+              transform: translateY(-2px) scale(1.025);
+              filter:
+                drop-shadow(0 10px 18px rgba(0, 0, 0, 0.52))
+                drop-shadow(0 0 16px rgba(227, 38, 38, 0.20));
+            }
+
+            .desktop-brand-glow {
+              position: absolute;
+              left: 50%;
+              top: 50%;
+              width: 82px;
+              height: 48px;
+              background: radial-gradient(
+                ellipse,
+                rgba(227, 38, 38, 0.11),
+                transparent 68%
+              );
+              transform: translate(-50%, -50%);
+              pointer-events: none;
+            }
+          }
+
+          @media (min-width: 901px) and (max-width: 1180px) {
+            .navbar-inner {
+              width: calc(100% - 28px);
+              grid-template-columns:
+                minmax(0, 1fr)
+                88px
+                minmax(0, 1fr);
+              gap: 12px !important;
+            }
+
+            .desktop-nav {
+              gap: 16px;
+            }
+
+            .desktop-nav-left {
+              padding-right: 8px;
+            }
+
+            .desktop-nav-right {
+              padding-left: 8px;
+            }
+
+            .desktop-nav a {
+              font-size: 12px;
+              letter-spacing: 0;
+            }
+
+            .desktop-brand {
+              width: 88px;
+            }
+
+            .desktop-brand img {
+              width: 62px;
+              height: 62px;
+            }
+          }
+
+          /* =========================
+             MOBİL GENEL GÖRÜNÜM - PROFESYONEL
+             ========================= */
+          .mobile-menu-toggle,
+          .mobile-menu-backdrop {
+            display: none;
+          }
+
+          @media (max-width: 900px) {
+            .desktop-nav,
+            .desktop-brand {
+              display: none !important;
+            }
+
+            .mobile-brand {
+              display: flex !important;
+            }
+
+            html {
+              scroll-snap-type: none !important;
+              scroll-padding-top: 76px;
+            }
+
+            body {
+              overflow-x: hidden;
+            }
+
+            .site-page {
+              position: relative;
+              width: 100%;
+              max-width: 100%;
+              overflow-x: hidden;
+              background:
+                linear-gradient(
+                  180deg,
+                  #080808 0%,
+                  #050505 55%,
+                  #090404 100%
+                ) !important;
+              background-image: none !important;
+              background-attachment: scroll !important;
+            }
+
+            /* Mobilde her bölümde arka plan görünür kalsın. */
+            .site-section {
+              min-height: calc(100svh - 68px) !important;
+              scroll-snap-align: none !important;
+              scroll-margin-top: 76px;
+              background: transparent !important;
+              background-image: none !important;
+            }
+
+            .navbar {
+              height: 68px !important;
+              z-index: 300 !important;
+              background: rgba(5, 5, 5, 0.96) !important;
+              border-bottom: 1px solid rgba(227, 38, 38, 0.13) !important;
+              backdrop-filter: blur(14px);
+              -webkit-backdrop-filter: blur(14px);
+            }
+
+            .navbar-inner {
+              height: 68px !important;
+              padding: 0 12px !important;
+              display: flex !important;
+              align-items: center !important;
+              justify-content: flex-start !important;
+              gap: 10px !important;
+            }
+
+            .mobile-menu-toggle {
+              width: 42px;
+              height: 42px;
+              flex: 0 0 42px;
+              padding: 0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-direction: column;
+              gap: 5px;
+              background: rgba(12, 12, 12, 0.88);
+              border: 1px solid rgba(227, 38, 38, 0.34);
+              border-radius: 11px;
+              cursor: pointer;
+              z-index: 330;
+              box-shadow:
+                inset 0 0 18px rgba(227, 38, 38, 0.04),
+                0 6px 18px rgba(0, 0, 0, 0.28);
+            }
+
+            .mobile-menu-toggle span {
+              width: 18px;
+              height: 2px;
+              display: block;
+              background: #e32626;
+              border-radius: 99px;
+              transition:
+                transform 0.2s ease,
+                opacity 0.2s ease;
+            }
+
+            .mobile-menu-toggle.open span:nth-child(1) {
+              transform: translateY(7px) rotate(45deg);
+            }
+
+            .mobile-menu-toggle.open span:nth-child(2) {
+              opacity: 0;
+            }
+
+            .mobile-menu-toggle.open span:nth-child(3) {
+              transform: translateY(-7px) rotate(-45deg);
+            }
+
+            .brand {
+              min-width: 0;
+              max-width: calc(100% - 54px);
+              flex: 1 1 auto;
+            }
+
+            .mobile-brand {
+              height: 100%;
+              align-items: center;
+              gap: 9px !important;
+              overflow: hidden;
+            }
+
+            .brand-logo-image {
+              width: 34px !important;
+              height: 34px !important;
+              flex: 0 0 34px;
+            }
+
+            .brand-text {
+              min-width: 0;
+            }
+
+            .brand-text strong {
+              display: block;
+              max-width: 170px;
+              overflow: hidden;
+              font-size: 14px !important;
+              letter-spacing: 1.5px !important;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            }
+
+            .brand-text span {
+              display: block;
+              max-width: 170px;
+              overflow: hidden;
+              font-size: 7px !important;
+              letter-spacing: 2px !important;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            }
+
+            /* Menü ekranın üstünde net görünür, arka sayfa karartılır. */
+            .mobile-nav {
+              isolation: isolate;
+              filter: none !important;
+              backdrop-filter: none !important;
+              -webkit-backdrop-filter: none !important;
+              position: fixed !important;
+              top: 68px !important;
+              left: 0 !important;
+              bottom: 0 !important;
+              z-index: 320 !important;
+              width: min(310px, 86vw) !important;
+              height: calc(100dvh - 68px) !important;
+              padding: 16px 12px 28px !important;
+              display: flex !important;
+              flex-direction: column !important;
+              align-items: stretch !important;
+              gap: 5px !important;
+              overflow-x: hidden !important;
+              overflow-y: auto !important;
+              -webkit-overflow-scrolling: touch;
+              background:
+                radial-gradient(
+                  circle at 0 0,
+                  rgba(227, 38, 38, 0.15),
+                  transparent 32%
+                ),
+                rgba(5, 5, 5, 0.985) !important;
+              border-right: 1px solid rgba(227, 38, 38, 0.20);
+              box-shadow: 24px 0 60px rgba(0, 0, 0, 0.62);
+              backdrop-filter: none !important;
+              -webkit-backdrop-filter: none !important;
+              transform: translate3d(-105%, 0, 0);
+              transition: transform 0.24s ease;
+              will-change: transform;
+            }
+
+            .mobile-nav.mobile-open {
+              transform: translate3d(0, 0, 0);
+            }
+
+            .mobile-nav a {
+              width: 100%;
+              height: 46px !important;
+              min-height: 46px !important;
+              padding: 0 14px !important;
+              flex: 0 0 46px !important;
+              display: flex !important;
+              align-items: center !important;
+              justify-content: flex-start !important;
+              color: #aaa69f !important;
+              background: transparent !important;
+              border: 1px solid transparent !important;
+              border-radius: 9px !important;
+              font-size: 12px !important;
+              font-weight: 700 !important;
+              line-height: 1 !important;
+              text-align: left !important;
+            }
+
+            .mobile-nav a:hover,
+            .mobile-nav a.active {
+              color: #f1eee8 !important;
+              background: rgba(227, 38, 38, 0.085) !important;
+              border-color: rgba(227, 38, 38, 0.18) !important;
+            }
+
+            .mobile-nav a.active::after {
+              display: none !important;
+            }
+
+            .mobile-menu-backdrop {
+              position: fixed;
+              inset: 68px 0 0 0;
+              z-index: 250;
+              width: 100%;
+              height: calc(100dvh - 68px);
+              display: block;
+              padding: 0;
+              background: rgba(0, 0, 0, 0.64);
+              border: 0;
+              border-radius: 0;
+              backdrop-filter: blur(3px);
+              -webkit-backdrop-filter: blur(3px);
+            }
+
+            .hero {
+              min-height: calc(100svh - 68px) !important;
+              padding: 84px 14px 34px !important;
+              align-items: center !important;
+            }
+
+            .content-section {
+              min-height: calc(100svh - 68px) !important;
+              padding: 28px 14px 38px !important;
+              align-items: flex-start !important;
+              justify-content: center !important;
+            }
+
+            .content-section > .section-content {
+              transform: none !important;
+              margin-top: 0 !important;
+            }
+
+            .section-content,
+            .hero-content {
+              width: 100% !important;
+              max-width: 100% !important;
+              margin-left: auto !important;
+              margin-right: auto !important;
+            }
+
+            .content-section .section-topline {
+              margin-top: 0 !important;
+            }
+
+            .section-topline,
+            .hero-topline {
+              margin-bottom: 10px !important;
+              gap: 10px !important;
+              font-size: 8px !important;
+              letter-spacing: 4px !important;
+            }
+
+            .section-topline span,
+            .hero-topline span {
+              width: 24px !important;
+            }
+
+            .section-title {
+              max-width: 100%;
+              font-size: clamp(30px, 10vw, 44px) !important;
+              letter-spacing: 2.5px !important;
+              line-height: 1.06 !important;
+              text-align: center !important;
+              overflow-wrap: anywhere;
+            }
+
+            .hero-content h1 {
+              max-width: 100%;
+              font-size: clamp(44px, 15vw, 68px) !important;
+              letter-spacing: 2.5px !important;
+              line-height: 0.98 !important;
+              text-align: center !important;
+              overflow-wrap: anywhere;
+            }
+
+            .hero-content h2 {
+              max-width: 100%;
+              margin-top: 14px !important;
+              font-size: clamp(18px, 6vw, 28px) !important;
+              letter-spacing: 6px !important;
+              text-align: center !important;
+            }
+
+            .hero-buttons {
+              width: 100%;
+              max-width: 420px;
+              margin-top: 28px !important;
+              flex-direction: column !important;
+              gap: 10px !important;
+            }
+
+            .hero-buttons .btn,
+            .server-action-btn {
+              width: 100% !important;
+              height: 50px !important;
+              font-size: 13px !important;
+            }
+
+            .hero-announcements {
+              position: relative !important;
+              inset: auto !important;
+              width: 100% !important;
+              max-width: 420px !important;
+              margin: 44px auto 26px !important;
+              transform: none !important;
+            }
+
+            /* GALERİ - menüden gelince başlık düzgün merkezde başlar */
+            #galeri.content-section {
+              padding-top: 28px !important;
+            }
+
+            #galeri .gallery-section-content {
+              width: 100% !important;
+              align-items: center !important;
+            }
+
+            #galeri .gallery-grid {
+              width: 100% !important;
+              margin-top: 20px !important;
+              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+              gap: 9px !important;
+            }
+
+            #galeri .gallery-card {
+              border-radius: 8px !important;
+            }
+
+            /* YÖNETİM */
+            #yonetim .management-grid {
+              width: 100% !important;
+              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+              gap: 10px !important;
+            }
+
+            #yonetim .management-card {
+              min-height: 210px !important;
+              padding: 16px !important;
+            }
+
+            #yonetim .management-avatar-box {
+              width: 54px !important;
+              height: 54px !important;
+              border-radius: 13px !important;
+            }
+
+            #yonetim .management-name {
+              margin-top: 12px !important;
+              font-size: 16px !important;
+            }
+
+            /* SUNUCULAR - mobil için tamamen ayrı kompakt düzen */
+            #sunucular.content-section {
+              min-height: auto !important;
+              padding: 28px 12px 36px !important;
+              align-items: flex-start !important;
+              justify-content: flex-start !important;
+              overflow: visible !important;
+            }
+
+            #sunucular .servers-section-content {
+              width: 100% !important;
+              max-width: 520px !important;
+              margin: 0 auto !important;
+            }
+
+            #sunucular .server-triple-grid {
+              width: 100% !important;
+              margin-top: 20px !important;
+              grid-template-columns: 1fr !important;
+              gap: 12px !important;
+            }
+
+            #sunucular .server-square-card {
+              width: 100% !important;
+              max-width: 100% !important;
+              min-height: 0 !important;
+              height: auto !important;
+              aspect-ratio: auto !important;
+              padding: 15px !important;
+              overflow: visible !important;
+              border-radius: 13px !important;
+            }
+
+            #sunucular .server-square-card .server-card-index {
+              top: 12px !important;
+              right: 14px !important;
+              font-size: 30px !important;
+            }
+
+            #sunucular .server-square-card .server-panel-top {
+              min-height: 50px !important;
+              padding-bottom: 10px !important;
+              gap: 10px !important;
+            }
+
+            #sunucular .server-square-card .server-panel-top small {
+              font-size: 6px !important;
+              letter-spacing: 1.5px !important;
+            }
+
+            #sunucular .server-square-card .server-panel-top h3 {
+              max-width: calc(100% - 74px);
+              font-size: 14px !important;
+              line-height: 1.25 !important;
+              -webkit-line-clamp: 2;
+            }
+
+            #sunucular .server-live-status {
+              gap: 7px !important;
+            }
+
+            #sunucular .server-live-status strong {
+              font-size: 9px !important;
+            }
+
+            #sunucular .server-square-card .server-panel-stats {
+              margin-top: 9px !important;
+              display: grid !important;
+              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+              gap: 0 !important;
+            }
+
+            #sunucular .server-square-card .server-stat {
+              min-width: 0 !important;
+              min-height: 48px !important;
+              padding: 7px 8px !important;
+              gap: 7px !important;
+            }
+
+            #sunucular .server-square-card .server-stat:nth-child(odd) {
+              padding-left: 0 !important;
+            }
+
+            #sunucular .server-square-card .server-stat:nth-child(even) {
+              padding-right: 0 !important;
+            }
+
+            #sunucular .server-square-card .server-stat small {
+              margin-bottom: 3px !important;
+              font-size: 5.5px !important;
+              letter-spacing: 1px !important;
+            }
+
+            #sunucular .server-square-card .server-stat strong {
+              display: block;
+              max-width: 100%;
+              overflow: hidden;
+              font-size: 9.5px !important;
+              line-height: 1.3 !important;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+
+            #sunucular .server-square-card .info-svg-icon {
+              width: 16px !important;
+              height: 16px !important;
+              flex: 0 0 16px !important;
+            }
+
+            #sunucular .server-square-card .server-panel-actions {
+              margin-top: 8px !important;
+              padding-top: 8px !important;
+            }
+
+            #sunucular .server-square-card .server-panel-actions a {
+              width: 100% !important;
+              height: 36px !important;
+              font-size: 8px !important;
+            }
+
+            #sunucular .server-square-card > .server-square-list,
+            #sunucular .ts3-square-card > .server-square-list {
+              width: 100% !important;
+              min-height: 0 !important;
+              margin-top: 9px !important;
+              padding-top: 9px !important;
+              display: flex !important;
+              flex: none !important;
+              flex-direction: column !important;
+              border-left: 0 !important;
+              border-top: 1px solid rgba(242, 238, 230, 0.09) !important;
+            }
+
+            #sunucular .server-square-list-title {
+              margin-bottom: 7px !important;
+              font-size: 7px !important;
+              letter-spacing: 1px !important;
+            }
+
+            #sunucular .server-square-list-title span:last-child {
+              font-size: 6.5px !important;
+            }
+
+            #sunucular .server-square-list-items {
+              width: 100% !important;
+              min-height: 70px !important;
+              max-height: 220px !important;
+              display: grid !important;
+              align-content: start !important;
+              gap: 5px !important;
+              overflow-x: hidden !important;
+              overflow-y: auto !important;
+              overscroll-behavior: contain;
+              -webkit-overflow-scrolling: touch;
+              touch-action: pan-y;
+              padding: 0 3px 3px 0 !important;
+              scrollbar-width: thin !important;
+              scrollbar-color: rgba(227, 38, 38, 0.42) transparent;
+            }
+
+            #sunucular .server-square-list-items::-webkit-scrollbar {
+              width: 4px !important;
+              display: block !important;
+            }
+
+            #sunucular .server-square-list-items::-webkit-scrollbar-track {
+              background: transparent;
+            }
+
+            #sunucular .server-square-list-items::-webkit-scrollbar-thumb {
+              background: rgba(227, 38, 38, 0.42);
+              border-radius: 99px;
+            }
+
+            #sunucular .server-square-player {
+              min-height: 32px !important;
+              padding: 6px 7px !important;
+              grid-template-columns: 22px minmax(0, 1fr) auto !important;
+              gap: 6px !important;
+              border-radius: 6px !important;
+              font-size: 9px !important;
+            }
+
+            #sunucular .server-square-player strong {
+              font-size: 9px !important;
+            }
+
+            #sunucular .server-square-player > span:last-child {
+              font-size: 8px !important;
+            }
+
+            /* Kurallar / destek / iletişim */
+            .simple-rules-tabs,
+            .rules-editor-tabs {
+              width: 100% !important;
+            }
+
+            .simple-rules-card,
+            .support-card,
+            .contact-big-card {
+              width: 100% !important;
+              max-width: 100% !important;
+            }
+
+            .simple-rules-scroll {
+              max-height: min(56svh, 500px) !important;
+              overflow-y: auto !important;
+              -webkit-overflow-scrolling: touch;
+            }
+
+            #dosyalar .downloads-grid {
+              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+              gap: 10px !important;
+            }
+
+            input,
+            textarea,
+            select {
+              max-width: 100%;
+            }
+          }
+
+          @media (max-width: 600px) {
+            .navbar-inner {
+              padding: 0 10px !important;
+            }
+
+            .brand-text strong {
+              max-width: 130px;
+            }
+
+            .brand-text span {
+              max-width: 130px;
+            }
+
+            .content-section {
+              padding-top: 24px !important;
+              padding-left: 11px !important;
+              padding-right: 11px !important;
+            }
+
+            .section-title {
+              font-size: clamp(29px, 9.5vw, 40px) !important;
+            }
+
+            #galeri .gallery-grid,
+            #yonetim .management-grid,
+            #dosyalar .downloads-grid {
+              grid-template-columns: 1fr !important;
+            }
+
+            #galeri .gallery-card {
+              max-width: 440px;
+              margin-left: auto;
+              margin-right: auto;
+            }
+
+            #yonetim .management-card {
+              min-height: 200px !important;
+            }
+
+            #sunucular .server-square-card {
+              padding: 13px !important;
+            }
+
+            #sunucular .server-square-card .server-panel-stats {
+              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+
+            .hero-announcements {
+              max-width: 100% !important;
+            }
+
+            input,
+            textarea,
+            select {
+              font-size: 16px !important;
+            }
+          }
+
+          @media (max-width: 380px) {
+            .navbar-inner {
+              padding: 0 8px !important;
+            }
+
+            .mobile-menu-toggle {
+              width: 40px;
+              height: 40px;
+              flex-basis: 40px;
+            }
+
+            .brand-logo-image {
+              width: 33px !important;
+              height: 33px !important;
+            }
+
+            .brand-text strong {
+              max-width: 112px;
+              font-size: 13px !important;
+            }
+
+            .brand-text span {
+              max-width: 112px;
+              font-size: 6.5px !important;
+              letter-spacing: 1.5px !important;
+            }
+
+            #sunucular .server-square-card .server-stat strong {
+              font-size: 8.5px !important;
+            }
+
+            #sunucular .server-square-player {
+              grid-template-columns: 19px minmax(0, 1fr) auto !important;
+            }
+          }
+
+
+
+          /* =========================
+             MOBİL: SUNUCULAR + İLETİŞİM ÜST HİZA FIX
+             globals.css içindeki ID bazlı eski paddingleri kesin olarak ezer.
+             ========================= */
+          @media (max-width: 900px) {
+            main.site-page #sunucular.content-section,
+            main.site-page #iletisim.content-section {
+              min-height: auto !important;
+              padding-top: 28px !important;
+              padding-bottom: 38px !important;
+              align-items: flex-start !important;
+              justify-content: flex-start !important;
+            }
+
+            main.site-page #sunucular .servers-section-content,
+            main.site-page #iletisim .contact-section-content {
+              width: 100% !important;
+              margin-top: 0 !important;
+              transform: none !important;
+            }
+
+            main.site-page #sunucular .section-topline,
+            main.site-page #iletisim .section-topline {
+              margin-top: 0 !important;
+            }
+
+            main.site-page #iletisim .contact-single-wrap {
+              margin-top: 24px !important;
+            }
+          }
+
+          @media (max-width: 600px) {
+            main.site-page #sunucular.content-section,
+            main.site-page #iletisim.content-section {
+              padding-top: 24px !important;
+            }
+          }
+
+`}</style>
 
         <div className="section-overlay"></div>
 
@@ -4104,12 +5092,32 @@ export default function Home() {
               {prices.map((item, index) => {
 
                 const featureList = String(item.features || "")
-
                   .split("\n")
-
                   .map((feature) => feature.trim())
-
                   .filter(Boolean);
+
+                const tableRows = featureList
+                  .filter((feature) => feature.includes("|"))
+                  .map((feature) => {
+                    const isHeader = feature.startsWith("#");
+                    const cleanFeature = feature.replace(/^#\s*/, "");
+                    return {
+                      isHeader,
+                      cells: cleanFeature
+                        .split("|")
+                        .map((cell) => cell.trim())
+                        .filter(Boolean),
+                    };
+                  })
+                  .filter((row) => row.cells.length > 1);
+
+                const plainFeatures = featureList.filter(
+                  (feature) => !feature.includes("|")
+                );
+
+                const whatsappMessage = encodeURIComponent(
+                  `Merhaba, LCA Pro Public "${item.title}" fiyatı hakkında bilgi almak istiyorum.`
+                );
 
                 return (
 
@@ -4121,7 +5129,11 @@ export default function Home() {
 
                     </div>
 
-                    <div className="price-card-head">
+                    <div
+                      className={`price-card-head ${
+                        !item.price && !item.period ? "price-card-head-centered" : ""
+                      }`}
+                    >
 
                       <small>PAKET</small>
 
@@ -4129,75 +5141,85 @@ export default function Home() {
 
                     </div>
 
-                    <div className="price-card-price">
-
-                      <span className="price-card-price-main">
-
-                        {item.price || "Fiyat için iletişime geçin"}
-
-                      </span>
-
-                      {item.period && (
-
-                        <span className="price-card-period">
-
-                          / {item.period}
-
+                    <div
+                      className={`price-card-price ${
+                        !item.price && !item.period ? "price-card-price-empty" : ""
+                      }`}
+                    >
+                      {item.price && (
+                        <span className="price-card-price-main">
+                          {item.price}
                         </span>
-
                       )}
 
+                      {item.period && (
+                        <span className="price-card-period">
+                          {item.price ? "/ " : ""}
+                          {item.period}
+                        </span>
+                      )}
+
+                      {!item.price && !item.period && (
+                        <span className="price-card-period" aria-hidden="true">
+                          &nbsp;
+                        </span>
+                      )}
                     </div>
 
-                    {item.description && (
-
-                      <p className="price-card-description">
-
-                        {item.description}
-
-                      </p>
-
-                    )}
-
-                    {featureList.length > 0 && (
-
-                      <div className="price-card-features">
-
-                        {featureList.map((feature, featureIndex) => (
-
-                          <div
-
-                            className="price-card-feature"
-
-                            key={`${item.id}-${featureIndex}`}
-
-                          >
-
-                            <span></span>
-
-                            <strong>{feature}</strong>
-
-                          </div>
-
-                        ))}
-
+                    {tableRows.length > 0 && (
+                      <div className="price-card-table-wrap">
+                        <div className="price-card-table">
+                          {tableRows.map((row, rowIndex) => (
+                            <div
+                              className={`price-table-row ${
+                                row.isHeader ? "price-table-head" : ""
+                              }`}
+                              style={{
+                                gridTemplateColumns: `repeat(${row.cells.length}, minmax(0, 1fr))`,
+                              }}
+                              key={`${item.id}-row-${rowIndex}`}
+                            >
+                              {row.cells.map((cell, cellIndex) => (
+                                <span
+                                  key={`${item.id}-row-${rowIndex}-cell-${cellIndex}`}
+                                >
+                                  {cell}
+                                </span>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-
                     )}
 
-                    <button
+                    {plainFeatures.length > 0 && (
+                      <div className="price-card-features">
+                        {plainFeatures.map((feature, featureIndex) => (
+                          <div
+                            className="price-card-feature"
+                            key={`${item.id}-${featureIndex}`}
+                          >
+                            <span></span>
+                            <strong>{feature}</strong>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
-                      type="button"
+                    {item.description && (
+                      <p className="price-card-description price-card-description-bottom">
+                        {item.description}
+                      </p>
+                    )}
 
-                      className="price-card-action"
-
-                      onClick={() => goToSection("iletisim")}
-
+                    <a
+                      className="price-card-action price-card-whatsapp"
+                      href={`https://wa.me/905050154372?text=${whatsappMessage}`}
+                      target="_blank"
+                      rel="noreferrer"
                     >
-
-                      İLETİŞİME GEÇ
-
-                    </button>
+                      WHATSAPP İLE İLETİŞİME GEÇ
+                    </a>
 
                   </article>
 

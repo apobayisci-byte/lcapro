@@ -14,6 +14,8 @@ const [authLoading, setAuthLoading] = useState(true);
 
 const [activeTab, setActiveTab] = useState("gallery");
 
+const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
 const [email, setEmail] = useState("");
 
 const [password, setPassword] = useState("");
@@ -2008,7 +2010,7 @@ const payload = {
 
 title: priceTitle.trim(),
 
-price: priceValue.trim() || null,
+price: priceValue.trim(),
 
 period: pricePeriod.trim() || null,
 
@@ -2054,7 +2056,11 @@ if (error) {
 
 console.error(error);
 
-setPanelMessage("Fiyat kartı kaydedilemedi.");
+setPanelMessage(
+error?.message
+? `Fiyat kartı kaydedilemedi: ${error.message}`
+: "Fiyat kartı kaydedilemedi."
+);
 
 setPriceSaving(false);
 
@@ -3256,6 +3262,18 @@ YÖNETİCİ PANELİ
 
 </div>
 
+<button
+type="button"
+className={`admin-mobile-menu-button ${mobileMenuOpen ? "active" : ""}`}
+onClick={() => setMobileMenuOpen((old) => !old)}
+aria-label={mobileMenuOpen ? "Yönetim menüsünü kapat" : "Yönetim menüsünü aç"}
+aria-expanded={mobileMenuOpen}
+>
+<span></span>
+<span></span>
+<span></span>
+</button>
+
 <div className="admin-header-actions">
 
 <a
@@ -3290,7 +3308,14 @@ onClick={handleLogout}
 
 <div className="admin-layout">
 
-<aside className="admin-sidebar">
+<aside
+className={`admin-sidebar ${mobileMenuOpen ? "mobile-open" : ""}`}
+onClick={(event) => {
+if (event.target instanceof Element && event.target.closest(".admin-menu-item")) {
+setMobileMenuOpen(false);
+}
+}}
+>
 
 <div className="admin-sidebar-title">
 
@@ -3543,6 +3568,15 @@ setActiveTab("contact");
 </button>
 
 </aside>
+
+{mobileMenuOpen && (
+<button
+type="button"
+className="admin-mobile-menu-backdrop"
+aria-label="Yönetim menüsünü kapat"
+onClick={() => setMobileMenuOpen(false)}
+/>
+)}
 
 <section className="admin-content">
 
@@ -4932,6 +4966,242 @@ SİL
 }
 `}</style>
 
+
+<style jsx global>{`
+.admin-mobile-menu-button,
+.admin-mobile-menu-backdrop {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .admin-page {
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .admin-header {
+    position: sticky !important;
+    top: 0;
+    z-index: 120 !important;
+    height: 68px !important;
+    min-height: 68px !important;
+    padding: 0 10px !important;
+    gap: 8px;
+  }
+
+  .admin-header-brand {
+    min-width: 0;
+    gap: 8px !important;
+  }
+
+  .admin-header-brand img {
+    width: 36px !important;
+    height: 36px !important;
+    flex: 0 0 36px;
+  }
+
+  .admin-header-brand > div {
+    min-width: 0;
+  }
+
+  .admin-header-brand strong {
+    display: block;
+    max-width: 120px;
+    overflow: hidden;
+    font-size: 13px !important;
+    letter-spacing: 1.3px !important;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .admin-header-brand span {
+    font-size: 6px !important;
+    letter-spacing: 1.7px !important;
+    white-space: nowrap;
+  }
+
+  .admin-mobile-menu-button {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    margin-left: auto;
+    padding: 0;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(227, 38, 38, 0.20);
+    border-radius: 10px;
+  }
+
+  .admin-mobile-menu-button span {
+    width: 18px;
+    height: 2px;
+    display: block;
+    background: #e32626;
+    border-radius: 99px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .admin-mobile-menu-button.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .admin-mobile-menu-button.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .admin-mobile-menu-button.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .admin-header-actions {
+    gap: 5px !important;
+  }
+
+  .admin-header-actions .admin-secondary-button {
+    min-height: 40px !important;
+    height: 40px !important;
+    padding: 0 9px !important;
+    font-size: 8px !important;
+    white-space: nowrap;
+  }
+
+  .admin-header-actions > a.admin-secondary-button {
+    display: none !important;
+  }
+
+  .admin-layout {
+    min-height: calc(100vh - 68px) !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .admin-sidebar {
+    position: fixed !important;
+    top: 68px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    z-index: 110 !important;
+    width: min(292px, 86vw) !important;
+    height: calc(100dvh - 68px) !important;
+    padding: 18px 14px 28px !important;
+    display: block !important;
+    overflow-y: auto;
+    background:
+      radial-gradient(circle at 0 0, rgba(227, 38, 38, 0.12), transparent 34%),
+      rgba(6, 6, 6, 0.98) !important;
+    border-right: 1px solid rgba(227, 38, 38, 0.18) !important;
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+    transform: translateX(-105%);
+    transition: transform 0.23s ease;
+  }
+
+  .admin-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .admin-sidebar .admin-menu-item {
+    height: 46px !important;
+    margin-bottom: 5px !important;
+    padding: 0 13px !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px !important;
+    border-radius: 9px !important;
+  }
+
+  .admin-mobile-menu-backdrop {
+    position: fixed;
+    inset: 68px 0 0 0;
+    z-index: 100;
+    width: 100%;
+    height: calc(100dvh - 68px);
+    display: block !important;
+    background: rgba(0, 0, 0, 0.58);
+    border: 0;
+    border-radius: 0;
+    backdrop-filter: blur(2px);
+  }
+
+  .admin-content {
+    width: 100% !important;
+    min-width: 0;
+    padding: 22px 12px 34px !important;
+    margin: 0 !important;
+  }
+
+  .admin-section-heading h1 {
+    font-size: clamp(27px, 9vw, 36px) !important;
+    line-height: 1.08 !important;
+    letter-spacing: 1px !important;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-card {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 18px !important;
+    padding: 16px 12px !important;
+    border-radius: 12px !important;
+  }
+
+  .management-admin-form,
+  .gallery-upload-form,
+  .server-admin-form,
+  .announcement-admin-form,
+  .price-admin-form,
+  .download-admin-form,
+  .admin-server-grid,
+  .admin-gallery-grid,
+  .admin-management-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .price-admin-form .price-admin-wide,
+  .download-admin-form .download-admin-wide,
+  .server-admin-form-actions {
+    grid-column: auto !important;
+  }
+
+  .admin-card-heading-row {
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+
+  .admin-server-actions,
+  .admin-gallery-actions,
+  .admin-management-actions,
+  .announcement-admin-actions,
+  .server-admin-form-actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-small-button {
+    min-width: 88px;
+  }
+
+  .admin-field input,
+  .admin-field textarea,
+  .admin-field select,
+  .admin-login-form input {
+    width: 100% !important;
+    max-width: 100%;
+    font-size: 16px !important;
+  }
+
+  .admin-login-wrap {
+    padding: 16px !important;
+  }
+
+  .admin-login-box {
+    padding: 24px 18px !important;
+  }
+}
+`}</style>
+
 {activeTab === "prices" && (
 
 <>
@@ -4948,7 +5218,7 @@ FİYAT YÖNETİMİ
 
 <p>
 
-Sitedeki fiyat kartlarını buradan ekleyebilir, düzenleyebilir, sıralayabilir ve gizleyebilirsin.
+Fiyat kartını ekle, tablo satırlarını alt alta yaz ve kaydet. Tablo kullanmak için hücreleri | işaretiyle ayır.
 
 </p>
 
@@ -4984,7 +5254,7 @@ value={priceTitle}
 
 onChange={(event) => setPriceTitle(event.target.value)}
 
-placeholder="Örn: VIP Paket"
+placeholder="Örn: Adminlik Fiyatları"
 
 maxLength={80}
 
@@ -5004,7 +5274,7 @@ value={priceValue}
 
 onChange={(event) => setPriceValue(event.target.value)}
 
-placeholder="Örn: 2000 ₺"
+placeholder="İsteğe bağlı • Örn: 2.000 ₺"
 
 />
 
@@ -5020,7 +5290,7 @@ value={pricePeriod}
 
 onChange={(event) => setPricePeriod(event.target.value)}
 
-placeholder="Örn: Aylık"
+placeholder="İsteğe bağlı • Örn: Aylık"
 
 />
 
@@ -5054,17 +5324,17 @@ value={priceDescription}
 
 onChange={(event) => setPriceDescription(event.target.value)}
 
-placeholder="Kartın açıklaması"
+placeholder="İsteğe bağlı kısa açıklama. Örn: Ödemeler sadece Ruddy hT üzerinden yapılır."
 
 maxLength={1500}
 
-rows={5}
+rows={3}
 
 />
 
 <small className="selected-file-info">
 
-Uzun açıklamalar da desteklenir ve sitede otomatik satıra bölünür.
+Bu alan isteğe bağlıdır. Kartın üst kısmında kısa bilgi olarak görünür.
 
 </small>
 
@@ -5080,15 +5350,15 @@ value={priceFeatures}
 
 onChange={(event) => setPriceFeatures(event.target.value)}
 
-placeholder={"Her satıra bir özellik yaz\nÖrn: Slot garantisi\nÖzel tag\nVIP silah menüsü"}
+placeholder={"TABLO ÖRNEĞİ:\n# Paket Türü | 1 Ay | 2 Ay | Sınırsız\nNormal Adminlik | 800 ₺ | 1.200 ₺ | 3.000 ₺\nTagsız Adminlik | 1.500 ₺ | 2.000 ₺ | 5.000 ₺\n\nBasit liste için | kullanmadan her satıra bir bilgi yazabilirsin."}
 
-rows={7}
+rows={9}
 
 />
 
 <small className="selected-file-info">
 
-Her satır sitede ayrı bir özellik olarak görünür.
+Tablo başlığı için satırın başına # koy. Sütunları | ile ayır. Örn: # Yönlendirme | Fiyat
 
 </small>
 
